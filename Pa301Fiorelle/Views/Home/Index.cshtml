@@ -70,26 +70,14 @@
                         </ul>
                     </div>
                 </div>
+                <div class="row" id="products-container">
+                    @await Html.PartialAsync("_ProductsPartial", products)
+                    @* <partial name="_ProductsPartial" model="@products"></partial> *@
+                </div>
                 <div class="row">
-                    @foreach (var item in products)
-                    {
-                        <div class="col-sm-6 col-md-4 col-lg-3 mt-3">
-                            <div class="product-item text-center" data-id="@item.Category?.Name">
-                                <div class="img">
-                                    <a href="">
-                                        <img src="~/img/@item.ImageName" class="img-fluid" alt="">
-                                    </a>
-                                </div>
-                                <div class="title mt-3">
-                                    <h6>@item.Name</h6>
-                                </div>
-                                <div class="price">
-                                    <span class="text-black-50">Add to cart</span>
-                                    <span class="text-black-50">$@item.Price</span>
-                                </div>
-                            </div>
-                        </div>
-                    }
+                    <div class="col-12 text-center mt-4">
+                        <button id="load-more-btn" class="btn btn-outline-dark" data-total="@homeViewModel.TotalProducts">Load More</button>
+                    </div>
                 </div>
             </div>
         </section>
@@ -353,3 +341,40 @@
     </main>
 
     <!-- MAIN END -->
+
+<script>
+    (function(){
+        const loadBtn = document.getElementById('load-more-btn');
+        if(!loadBtn) return;
+
+        let skip = 6;
+        const total = parseInt(loadBtn.dataset.total);
+
+        loadBtn.addEventListener('click', function(){
+            loadBtn.disabled = true;
+            loadBtn.textContent = 'Loading...';
+            fetch(`/Home/LoadMoreProducts?skip=${skip}`)
+                .then(r => {
+                    if(!r.ok) throw new Error('Network response was not ok');
+                    return r.text();
+                })
+                .then(html => {
+                    const container = document.getElementById('products-container');
+                    container.innerHTML += html;
+   
+                    skip += 6;
+                    if(skip >= total){
+                        loadBtn.style.display = 'none';
+                    } else {
+                        loadBtn.disabled = false;
+                        loadBtn.textContent = 'Load More';
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    loadBtn.disabled = false;
+                    loadBtn.textContent = 'Load More';
+                });
+        });
+    })();
+</script>

@@ -19,7 +19,12 @@ namespace Pa301Fiorelle.Controllers
         {
             var sliders = await _dbContext.Sliders.ToListAsync();
             var categories = await _dbContext.Categories.ToListAsync();
-            var products = await _dbContext.Products.ToListAsync();
+            var totalProducts = await _dbContext.Products.CountAsync();
+            var products = await _dbContext.Products
+                .Include(p => p.Category)
+                .OrderBy(p => p.Id)
+                .Take(6)
+                .ToListAsync();
             var bio = await _dbContext.Bios.SingleOrDefaultAsync();
 
             var homeViewModel = new HomeViewModel
@@ -27,10 +32,24 @@ namespace Pa301Fiorelle.Controllers
                 Sliders = sliders,
                 Categories = categories,
                 Products = products,
-                Bio = bio
+                Bio = bio,
+                TotalProducts = totalProducts
             };
 
             return View(homeViewModel);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> LoadMoreProducts(int skip)
+        {
+            var products = await _dbContext.Products
+                .Include(p => p.Category)
+                .OrderBy(p => p.Id)
+                .Skip(skip)
+                .Take(6)
+                .ToListAsync();
+
+            return PartialView("_ProductsPartial", products);
         }
 
         public IActionResult Details(int id)
