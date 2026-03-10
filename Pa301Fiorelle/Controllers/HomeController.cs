@@ -20,15 +20,24 @@ namespace Pa301Fiorelle.Controllers
             var sliders = await _dbContext.Sliders.ToListAsync();
             var categories = await _dbContext.Categories.ToListAsync();
             var products = await _dbContext.Products.ToListAsync();
-           
+            var bio = await _dbContext.Bios.SingleOrDefaultAsync();
+
             var homeViewModel = new HomeViewModel
             {
                 Sliders = sliders,
                 Categories = categories,
                 Products = products,
+                Bio = bio
             };
 
             return View(homeViewModel);
+        }
+
+        public IActionResult Details(int id)
+        {
+            ViewBag.Logo = "logo.png";
+
+            return View();
         }
     }
 }
