@@ -4,5 +4,7 @@
     {
         public int Id { get; set; }
         public string Logo { get; set; } = null!;
+
+        public string FooterImageName { get; set; } = null!;
     }
 }

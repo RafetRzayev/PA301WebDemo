@@ -20,4 +20,5 @@ namespace Pa301Fiorelle.ViewComponents
             return View(bio);
         }
     }
+
 }
