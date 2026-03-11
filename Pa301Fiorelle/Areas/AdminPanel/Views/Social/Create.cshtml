@@ -1,0 +1,25 @@
+﻿@model Social
+<div class="row">
+    <div class="col-md-6 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Add Social</h4>
+                <form class="forms-sample" method="post">
+                    <div class="form-group">
+                        <label for="exampleInputUsername1">Name</label>
+                        <input asp-for="Name" class="form-control" placeholder="name">
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Link</label>
+                        <input asp-for="Link" class="form-control"  placeholder="link">
+                        <span asp-validation-for="Link" class="text-danger"></span>
+                    </div>
+                    <div asp-validation-summary="ModelOnly"></div>
+                    <button type="submit" class="btn btn-primary mr-2">Submit</button>
+                    <button class="btn btn-light">Cancel</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -356,11 +356,32 @@
             fetch(`/Home/LoadMoreProducts?skip=${skip}`)
                 .then(r => {
                     if(!r.ok) throw new Error('Network response was not ok');
-                    return r.text();
+                    return r.json();
                 })
-                .then(html => {
+                .then(data => {
+                    console.log(data);
                     const container = document.getElementById('products-container');
-                    container.innerHTML += html;
+
+                    for (let item of data)
+                    {
+                        container.innerHTML += `
+                        <div class="col-sm-6 col-md-4 col-lg-3 mt-3">
+                            <div class="product-item text-center" data-id="${item.Category?.Name}">
+                                <div class="img">
+                                    <a href="">
+                                        <img src="~/img/${item.ImageName}" class="img-fluid" alt="">
+                                    </a>
+                                </div>
+                                <div class="title mt-3">
+                                    <h6>${item.Name}</h6>
+                                </div>
+                                <div class="price">
+                                    <span class="text-black-50">Add to cart</span>
+                                    <span class="text-black-50">$${item.Price}</span>
+                                </div>
+                            </div>
+                        </div>`;
+                    };
    
                     skip += 6;
                     if(skip >= total){

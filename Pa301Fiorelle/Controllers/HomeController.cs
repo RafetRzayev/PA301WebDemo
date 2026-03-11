@@ -49,7 +49,7 @@ namespace Pa301Fiorelle.Controllers
                 .Take(6)
                 .ToListAsync();
 
-            return PartialView("_ProductsPartial", products);
+            return Json(products);
         }
 
         public IActionResult Details(int id)
