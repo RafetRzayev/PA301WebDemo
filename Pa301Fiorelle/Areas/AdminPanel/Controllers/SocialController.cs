@@ -48,6 +48,40 @@ namespace Pa301Fiorelle.Areas.AdminPanel.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        public async Task<IActionResult> Update(int id)
+        {
+            var social = await _dbContext.Socials.FindAsync(id);
+            if (social == null)
+            {
+                return NotFound();
+            }
+            return View(social);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Update(int id, Social social)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(social);
+            }
+            var isExist = await _dbContext.Socials.AnyAsync(s => s.Name.ToLower() == social.Name.ToLower());
+            if (isExist)
+            {
+                ModelState.AddModelError("", "This social media already exists.");
+                return View(social);
+            }
+            var existingSocial = await _dbContext.Socials.FindAsync(id);
+            if (existingSocial == null)
+            {
+                return NotFound();
+            }
+            existingSocial.Name = social.Name;
+            existingSocial.Link = social.Link;
+            await _dbContext.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
