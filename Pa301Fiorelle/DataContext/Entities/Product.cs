@@ -1,4 +1,6 @@
-﻿namespace Pa301Fiorelle.DataContext.Entities
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Pa301Fiorelle.DataContext.Entities
 {
     public class Product
     {
