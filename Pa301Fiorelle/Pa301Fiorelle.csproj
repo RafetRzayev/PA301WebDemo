@@ -17,10 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Areas\AdminPanel\Data\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="wwwroot\admin\fonts\.DS_Store" />
     <None Include="wwwroot\admin\fonts\Roboto\.DS_Store" />
     <None Include="wwwroot\admin\images\.DS_Store" />
@@ -31,6 +27,10 @@
     <None Include="wwwroot\admin\scss\components\.DS_Store" />
     <None Include="wwwroot\admin\scss\mixins\.DS_Store" />
     <None Include="wwwroot\admin\vendors\.DS_Store" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\img\category\" />
   </ItemGroup>
 
 </Project>

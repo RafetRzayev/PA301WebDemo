@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Pa301Fiorelle.Areas.AdminPanel.Data;
 using Pa301Fiorelle.DataContext;
 
 namespace Pa301Fiorelle
@@ -15,6 +16,9 @@ namespace Pa301Fiorelle
             {
                 op.UseSqlServer(builder.Configuration.GetConnectionString("Default"));
             });
+
+            PathConstants.ProductPath = Path.Combine(builder.Environment.WebRootPath, "img");
+            PathConstants.CategoryPath = Path.Combine(builder.Environment.WebRootPath, "img", "category");
 
             var app = builder.Build();
 

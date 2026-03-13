@@ -52,6 +52,14 @@ namespace Pa301Fiorelle.Areas.AdminPanel.Controllers
             {
                 return NotFound();
             }
+            // Check whether category has any related products. If so, prevent deletion.
+            //var hasProducts = await _dbContext.Products.AnyAsync(p => p.CategoryId == id);
+            //if (hasProducts)
+            //{
+            //    TempData["ErrorMessage"] = "Cannot delete category because it has related products.";
+            //    return RedirectToAction(nameof(Index));
+            //}
+
             _dbContext.Categories.Remove(category);
             await _dbContext.SaveChangesAsync();
             return RedirectToAction(nameof(Index));

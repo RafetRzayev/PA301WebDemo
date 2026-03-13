@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AspNetCoreGeneratedDocument;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Pa301Fiorelle.Areas.AdminPanel.Data;
 using Pa301Fiorelle.Areas.AdminPanel.Models;
 using Pa301Fiorelle.DataContext;
 
@@ -48,7 +50,7 @@ namespace Pa301Fiorelle.Areas.AdminPanel.Controllers
                 return View(model);
             }
             var fileName = Path.GetFileNameWithoutExtension(model.Image.FileName) + Guid.NewGuid().ToString() + Path.GetExtension(model.Image.FileName);
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/img", fileName);
+            var path = Path.Combine(PathConstants.ProductPath, fileName);
             
             using (var stream = new FileStream(path, FileMode.Create))
             {
@@ -63,6 +65,26 @@ namespace Pa301Fiorelle.Areas.AdminPanel.Controllers
             };
             await _dbContext.Products.AddAsync(product);
             await _dbContext.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var product = await _dbContext.Products.FindAsync(id);
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            _dbContext.Products.Remove(product);
+            await _dbContext.SaveChangesAsync();
+
+            var path = Path.Combine(PathConstants.ProductPath, product.ImageName);
+            if (System.IO.File.Exists(path))
+            {
+                System.IO.File.Delete(path);
+            }
             return RedirectToAction(nameof(Index));
         }
 

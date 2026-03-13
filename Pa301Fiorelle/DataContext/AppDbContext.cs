@@ -15,5 +15,19 @@ namespace Pa301Fiorelle.DataContext
         public DbSet<Category> Categories { get; set; }
         public DbSet<Bio> Bios { get; set; }
         public DbSet<Social> Socials { get; set; }
+        
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            // Configure Product -> Category relationship to restrict deletes so
+            // deleting a Category with related Products will be prevented by the database
+            // (no cascade delete).
+            modelBuilder.Entity<Product>()
+                .HasOne(p => p.Category)
+                .WithMany(c => c.Products)
+                .HasForeignKey(p => p.CategoryId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            base.OnModelCreating(modelBuilder);
+        }
     }
 }
