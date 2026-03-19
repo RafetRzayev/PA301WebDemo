@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Pa301Fiorelle.DataContext;
@@ -6,6 +7,7 @@ using System.Diagnostics;
 
 namespace Pa301Fiorelle.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly AppDbContext _dbContext;
@@ -36,7 +38,23 @@ namespace Pa301Fiorelle.Controllers
                 TotalProducts = totalProducts
             };
 
+            //Response.Cookies.Append("LastVisit", DateTime.UtcNow.ToString("o"));
+            
+            //HttpContext.Session.SetString("session", "hello");
+
             return View(homeViewModel);
+        }
+
+        public IActionResult GetCookie()
+        {
+            if (Request.Cookies.TryGetValue("LastVisit", out var lastVisit))
+            {
+                ViewBag.LastVisit = lastVisit;
+            }
+
+            var sessionValue = HttpContext.Session.GetString("session");
+            ViewBag.SessionValue = sessionValue;
+            return View();
         }
 
         [HttpGet]
