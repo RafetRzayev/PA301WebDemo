@@ -38,6 +38,9 @@ namespace Pa301Fiorelle
             .AddEntityFrameworkStores<AppDbContext>()
             .AddDefaultTokenProviders();
 
+            // register email sender
+            builder.Services.AddTransient<Services.IEmailSender, Pa301Fiorelle.Services.SmtpEmailSender>();
+
 
             builder.Services.AddSession();
 
@@ -51,7 +54,7 @@ namespace Pa301Fiorelle
             app.UseSession();
             app.UseRouting();
 
-            //app.UseAuthentication();
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllerRoute(

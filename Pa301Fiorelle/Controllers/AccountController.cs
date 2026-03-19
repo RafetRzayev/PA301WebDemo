@@ -11,12 +11,14 @@ namespace Pa301Fiorelle.Controllers
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly Services.IEmailSender _emailSender;
 
-        public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, RoleManager<IdentityRole> roleManager)
+        public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, RoleManager<IdentityRole> roleManager, Services.IEmailSender emailSender)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
+            _emailSender = emailSender;
         }
 
         public IActionResult Register()
@@ -43,21 +45,88 @@ namespace Pa301Fiorelle.Controllers
 
             if (result.Succeeded)
             {
-                //if (!await _roleManager.RoleExistsAsync("User"))
-                //{
-                //    await _roleManager.CreateAsync(new IdentityRole("User"));
-                //}
-                //await _userManager.AddToRoleAsync(user, "User");
-                //await _signInManager.SignInAsync(user, isPersistent: false);
                 return RedirectToAction("Index", "Home");
             }
             foreach (var error in result.Errors)
             {
                 ModelState.AddModelError("", error.Description);
             }
+            return View(model);
+        }
+       
+        public IActionResult ForgotPassword()
+        {
             return View();
         }
 
+        [HttpPost]
+        public async Task<IActionResult> ForgotPassword(Models.ForgotPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+            {
+                // Do not reveal that the user does not exist
+                return RedirectToAction(nameof(ForgotPasswordConfirmation));
+            }
+
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var callbackUrl = Url.Action("ResetPassword", "Account", new { token = token, email = user.Email }, Request.Scheme);
+
+            var html = $"Please reset your password by <a href=\"{callbackUrl}\">clicking here</a>.";
+            await _emailSender.SendEmailAsync(user.Email, "Reset Password", html);
+
+            return RedirectToAction(nameof(ForgotPasswordConfirmation));
+        }
+
+        public IActionResult ForgotPasswordConfirmation()
+        {
+            return View();
+        }
+
+        public IActionResult ResetPassword(string token, string? email)
+        {
+            if (token == null || email == null)
+            {
+                ModelState.AddModelError(string.Empty, "A code must be supplied for password reset.");
+            }
+            var model = new Models.ResetPasswordViewModel { Token = token, Email = email };
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword(Models.ResetPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+            {
+                // Do not reveal that the user does not exist
+                return RedirectToAction(nameof(ResetPasswordConfirmation));
+            }
+
+            var result = await _userManager.ResetPasswordAsync(user, model.Token, model.Password);
+            if (result.Succeeded)
+            {
+                return RedirectToAction(nameof(ResetPasswordConfirmation));
+            }
+
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+
+            return View(model);
+        }
+
+        public IActionResult ResetPasswordConfirmation()
+        {
+            return View();
+        }
         public IActionResult Login()
         {
             return View();
