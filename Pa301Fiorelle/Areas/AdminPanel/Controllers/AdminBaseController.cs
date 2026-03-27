@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Pa301Fiorelle.Areas.AdminPanel.Controllers
 {
     [Area("AdminPanel")]
-    [Authorize]
+    [Authorize(Roles ="Admin")]
     public class AdminBaseController : Controller
     {
 

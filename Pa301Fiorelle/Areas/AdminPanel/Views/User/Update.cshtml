@@ -1,0 +1,45 @@
+@model UserUpdateViewModel
+<div class="row">
+    <div class="col-md-6 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Update User</h4>
+                <form class="forms-sample" method="post">
+                    <input type="hidden" asp-for="Id" />
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input asp-for="UserName" class="form-control" placeholder="username">
+                        <span asp-validation-for="UserName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input asp-for="Email" class="form-control" placeholder="email">
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input asp-for="FullName" class="form-control" placeholder="full name">
+                        <span asp-validation-for="FullName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label>New Password <small class="text-muted">(leave blank to keep current)</small></label>
+                        <input asp-for="NewPassword" class="form-control" placeholder="new password">
+                        <span asp-validation-for="NewPassword" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label>Confirm Password</label>
+                        <input asp-for="ConfirmPassword" class="form-control" placeholder="confirm password">
+                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label>Role</label>
+                        <select asp-for="RoleName" asp-items="Model.Roles" class="form-control"></select>
+                    </div>
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <button type="submit" class="btn btn-primary mr-2">Submit</button>
+                    <a class="btn btn-light" asp-action="index">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

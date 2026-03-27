@@ -8,7 +8,7 @@ namespace Pa301Fiorelle
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -38,8 +38,15 @@ namespace Pa301Fiorelle
             .AddEntityFrameworkStores<AppDbContext>()
             .AddDefaultTokenProviders();
 
+            //builder.Services.ConfigureApplicationCookie(options =>
+            //{
+            //    options.AccessDeniedPath = "/Account/AccessDenied";
+            //});
+
             // register email sender
             builder.Services.AddTransient<Services.IEmailSender, Pa301Fiorelle.Services.SmtpEmailSender>();
+            // register Razor view to string renderer for generating email HTML from views
+            builder.Services.AddScoped<Services.IViewRenderService, Services.RazorViewToStringRenderer>();
 
 
             builder.Services.AddSession();
@@ -48,6 +55,35 @@ namespace Pa301Fiorelle
             PathConstants.CategoryPath = Path.Combine(builder.Environment.WebRootPath, "img", "category");
 
             var app = builder.Build();
+
+            using (var scope = app.Services.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                db.Database.Migrate();
+
+                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
+
+                if (!await roleManager.RoleExistsAsync("Admin"))
+                {
+                    await roleManager.CreateAsync(new IdentityRole("Admin"));
+                }
+
+                await roleManager.CreateAsync(new IdentityRole("Member"));
+                if (await userManager.FindByNameAsync("admin") is null)
+                {
+                    var admin = new AppUser
+                    {
+                        FullName = "Admin",
+                        UserName = "admin",
+                        Email = "admin@fiorelle.com",
+                        EmailConfirmed = true
+                    };
+
+                    await userManager.CreateAsync(admin, "Admin1234");
+                    await userManager.AddToRoleAsync(admin, "Admin");
+                }
+            }
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();

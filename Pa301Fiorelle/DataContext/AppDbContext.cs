@@ -18,7 +18,7 @@ namespace Pa301Fiorelle.DataContext
         public DbSet<Category> Categories { get; set; }
         public DbSet<Bio> Bios { get; set; }
         public DbSet<Social> Socials { get; set; }
-        
+        public DbSet<Test> Tests { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Configure Product -> Category relationship to restrict deletes so

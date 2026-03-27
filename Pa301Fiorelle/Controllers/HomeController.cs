@@ -7,7 +7,6 @@ using System.Diagnostics;
 
 namespace Pa301Fiorelle.Controllers
 {
-    [Authorize]
     public class HomeController : Controller
     {
         private readonly AppDbContext _dbContext;
@@ -28,6 +27,8 @@ namespace Pa301Fiorelle.Controllers
                 .Take(6)
                 .ToListAsync();
             var bio = await _dbContext.Bios.SingleOrDefaultAsync();
+
+            ViewBag.Title = "<h1>Send <span>flowers</span> like</h1>";
 
             var homeViewModel = new HomeViewModel
             {

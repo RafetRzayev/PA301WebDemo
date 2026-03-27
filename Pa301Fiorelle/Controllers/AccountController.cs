@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Pa301Fiorelle.DataContext.Entities;
 using Pa301Fiorelle.Models;
@@ -12,13 +13,20 @@ namespace Pa301Fiorelle.Controllers
         private readonly SignInManager<AppUser> _signInManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly Services.IEmailSender _emailSender;
+        private readonly Services.IViewRenderService _viewRenderer;
 
-        public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, RoleManager<IdentityRole> roleManager, Services.IEmailSender emailSender)
+       public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, RoleManager<IdentityRole> roleManager, Services.IEmailSender emailSender, Services.IViewRenderService viewRenderer)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
             _emailSender = emailSender;
+           _viewRenderer = viewRenderer;
+        }
+
+        public IActionResult AccessDenied()
+        {
+            return View();
         }
 
         public IActionResult Register()
@@ -38,7 +46,6 @@ namespace Pa301Fiorelle.Controllers
             {
                 UserName = model.UserName,
                 Email = model.Email,
-
             };
 
             var result = await _userManager.CreateAsync(user, model.Password);
@@ -73,10 +80,12 @@ namespace Pa301Fiorelle.Controllers
             }
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-            var callbackUrl = Url.Action("ResetPassword", "Account", new { token = token, email = user.Email }, Request.Scheme);
+            var encodedToken = Uri.EscapeDataString(token);
+            var callbackUrl = Url.Action("ResetPassword", "Account", new { token = encodedToken, email = user.Email }, Request.Scheme);
 
-            var html = $"Please reset your password by <a href=\"{callbackUrl}\">clicking here</a>.";
-            await _emailSender.SendEmailAsync(user.Email, "Reset Password", html);
+            // render email body from Razor view and send
+            var emailBody = await _viewRenderer.RenderToStringAsync("Emails/PasswordReset", callbackUrl);
+            await _emailSender.SendEmailAsync(user.Email, "Reset Password", emailBody);
 
             return RedirectToAction(nameof(ForgotPasswordConfirmation));
         }
